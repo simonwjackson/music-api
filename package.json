@@ -1,0 +1,44 @@
+{
+  "name": "music-collector",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "@apollo/federation": "^0.16.0",
+    "@apollo/gateway": "^0.16.0",
+    "apollo-server": "^2.13.1",
+    "bottleneck": "^2.19.5",
+    "google": "^2.1.0",
+    "google-it": "^1.5.0",
+    "graphql-iso-date": "^3.6.1",
+    "musicbrainz-api": "^0.5.2",
+    "node-persist": "^3.0.5",
+    "ramda": "^0.27.0",
+    "string-similarity": "^4.0.1",
+    "ytdl-core": "^2.1.4",
+    "ytpl": "^0.1.21"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.8.4",
+    "@babel/core": "^7.9.6",
+    "@babel/node": "^7.8.7",
+    "@babel/plugin-proposal-pipeline-operator": "^7.8.3",
+    "@babel/preset-env": "^7.9.6",
+    "babel-eslint": "^11.0.0-beta.0",
+    "concurrently": "^5.2.0",
+    "eslint": "^7.0.0",
+    "nodemon": "^2.0.3"
+  },
+  "scripts": {
+    "server": "concurrently -k npm:server:*",
+    "server:albumGoogler": "nodemon --exec babel-node src/graphql/gateways/albumGoogler",
+    "server:bandcamp": "nodemon --exec babel-node src/graphql/gateways/bandcamp",
+    "server:youtube": "nodemon --exec babel-node src/graphql/gateways/youtube",
+    "server:collections": "nodemon --exec babel-node src/graphql/gateways/collection",
+    "server:musicbrainz": "nodemon --exec babel-node src/graphql/gateways/musicbrainz",
+    "server:main": "sleep 1 && nodemon --exec babel-node --delay 1 src/graphql/index"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
