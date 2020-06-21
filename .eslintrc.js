@@ -1,30 +1,30 @@
 module.exports = {
-  'root': true,
-  'env': {
-    'commonjs': true,
-    'es6': true,
-    'node': true
+  root: true,
+  env: {
+    commonjs: true,
+    es6: true,
+    node: true
   },
-  'extends': 'eslint:recommended',
-  'parserOptions': {
-    'ecmaVersion': 2018
+  extends: 'eslint:recommended',
+  parserOptions: {
+    ecmaVersion: 2018
   },
-  'globals': {
-    'Atomics': 'readonly',
-    'SharedArrayBuffer': 'readonly'
+  globals: {
+    Atomics: 'readonly',
+    SharedArrayBuffer: 'readonly'
   },
-  'parser': 'babel-eslint', 
-  'rules': {
+  parser: 'babel-eslint', 
+  rules: {
     'space-infix-ops': 'error',
     'object-curly-spacing': ['error', 'always'],
-    'curly': ['error', 'multi', 'consistent'],
+    curly: ['error', 'multi', 'consistent'],
     'quote-props': ['error', 'as-needed'],
     'no-multiple-empty-lines': ['error', {
-      'max': 1,
-      'maxBOF': 1
+      max: 1,
+      maxBOF: 1
     }],
     'brace-style': ['error', 'stroustrup'],
-    'indent': [
+    indent: [
       'error',
       2
     ],
@@ -32,11 +32,11 @@ module.exports = {
       'error',
       'unix'
     ],
-    'quotes': [
+    quotes: [
       'error',
       'single'
     ],
-    'semi': [
+    semi: [
       'error',
       'never'
     ]
