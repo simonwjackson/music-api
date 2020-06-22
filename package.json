@@ -1,6 +1,6 @@
 {
   "name": "musicati",
-  "version": "20.06.22-1",
+  "version": "20.06.22",
   "description": "",
   "main": "index.js",
   "dependencies": {
@@ -26,9 +26,10 @@
     "@babel/core": "^7.9.6",
     "@babel/node": "^7.8.7",
     "@babel/plugin-proposal-pipeline-operator": "^7.8.3",
-    "@babel/preset-env": "^7.9.6",
     "@babel/plugin-transform-runtime": "^7.10.1",
+    "@babel/preset-env": "^7.9.6",
     "babel-eslint": "^11.0.0-beta.0",
+    "calver": "^20.5.2",
     "concurrently": "^5.2.0",
     "eslint": "^7.0.0",
     "nodemon": "^2.0.3"

@@ -26,10 +26,18 @@ jobs:
         node-version: ${{ matrix.node-version }}
     - run: npm ci
     - run: npm run build --if-present
+    - name: Bump release version
+      id: bump_version
+      run: npm version $(node build/bump-version)
+    - name: Get release version
+      id: get_version
+      run: echo ::set-env name=RELEASE_VERSION::$(node -p "require('./package.json').version")
     - name: Publish to Registry
       uses: elgohr/Publish-Docker-Github-Action@master
       with:
         name: simonwjackson/musicati
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
+        buildoptions: "--compress --force-rm"
+        tags: "latest,${{ env.RELEASE_VERSION }}"
 
