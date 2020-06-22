@@ -1,8 +1,5 @@
-const { ApolloServer, gql } = require('apollo-server')
+const { gql } = require('apollo-server')
 const { buildFederatedSchema } = require('@apollo/federation')
-const fetch = require('node-fetch')
-
-const port = 30001
 
 const typeDefs = gql`
   type Collection {
@@ -34,10 +31,6 @@ const resolvers = {
   }
 }
 
-const server = new ApolloServer({
+export default {
   schema: buildFederatedSchema({ typeDefs, resolvers })
-})
-
-server.listen({ port }).then(({ url }) => {
-  console.log(`Collection server ready at ${url}`)
-})
+}

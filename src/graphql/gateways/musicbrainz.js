@@ -218,7 +218,7 @@ const resolvers = {
       |> await #
       |> logger(#)
     }, 
-    musicBrainzReleases: async (a,s,d,f) => {
+    musicBrainzReleases: async (a,s) => {
       return mbApi.searchReleaseGroup(s.query)
         |> await #
         |> path(['release-groups'], #)
@@ -226,11 +226,6 @@ const resolvers = {
   }
 }
 
-const server = new ApolloServer({
+export default {
   schema: buildFederatedSchema({ typeDefs, resolvers })
-})
-
-server.listen({ port }).then(({ url }) => {
-  console.log(`Musicbrains server ready at ${url}`)
-})
-
+}

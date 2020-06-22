@@ -154,10 +154,6 @@ const resolvers = {
   },
 }
 
-const server = new ApolloServer({
+export default {
   schema: buildFederatedSchema({ typeDefs, resolvers })
-})
-
-server.listen({ port }).then(({ url }) => {
-  console.log(`Youtube server ready at ${url}`)
-})
+}

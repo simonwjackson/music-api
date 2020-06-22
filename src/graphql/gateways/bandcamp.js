@@ -144,10 +144,6 @@ const resolvers = {
   }
 }
 
-const server = new ApolloServer({
+export default {
   schema: buildFederatedSchema({ typeDefs, resolvers })
-})
-
-server.listen({ port }).then(({ url }) => {
-  console.log(`Bandcamp server ready at ${url}`)
-})
+}
