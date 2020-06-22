@@ -1,4 +1,7 @@
 {
     "presets": ["@babel/preset-env"],
-    "plugins": [["@babel/plugin-proposal-pipeline-operator", { "proposal": "smart" }]]
+    "plugins": [
+      ["@babel/plugin-transform-runtime", { "regenerator": true }],
+      ["@babel/plugin-proposal-pipeline-operator", { "proposal": "smart" }]
+    ]
 }
