@@ -1,6 +1,6 @@
 {
-  "name": "music-collector",
-  "version": "1.0.0",
+  "name": "musicati",
+  "version": "20.06.22-1",
   "description": "",
   "main": "index.js",
   "dependencies": {
