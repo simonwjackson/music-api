@@ -1,0 +1,25 @@
+---
+version: "3.7"
+
+services: 
+  app:
+    image: "node:current-alpine"
+    working_dir: /home/node/app
+    volumes:
+      - ./node_modules:/home/node/app/node_modules:delegated
+      - .:/home/node/app:consistent
+    ports:
+      - 30000:30000
+    entrypoint: "npm"
+
+  test:
+    image: "cypress/base:10"
+    working_dir: /home/node/app
+    volumes:
+      - cache:/root/.cache
+      - ./node_modules:/home/node/app/node_modules:delegated
+      - .:/home/node/app:consistent
+    entrypoint: "./node_modules/.bin/cypress"
+
+volumes:
+  cache:
