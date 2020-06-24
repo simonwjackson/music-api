@@ -1,10 +1,27 @@
+import process from 'process'
 import express from 'express'
 import { ApolloServer } from 'apollo-server-express' 
 import { ApolloGateway } from '@apollo/gateway'
 import * as gateways from './gateways' 
+import { anyPass, pathSatisfies, complement, isEmpty, isNil, allPass, path, pathOr } from 'ramda'
+import basicAuth from 'express-basic-auth'
 
-const port = 4000
+const port = pathOr(4000, ['env','PORT'], process)
 const app = express()
+const notEmpty = complement(isEmpty)
+const notNil = complement(isNil)
+const notFalsy = anyPass([
+  notEmpty,
+  notNil
+])
+
+const shouldChallenge = process =>
+  process
+    |> path(['env'], #)
+    |> allPass([
+      pathSatisfies(notFalsy, ['HTTP_USER']),
+      pathSatisfies(notFalsy, ['HTTP_PASS'])
+    ])(#)
 
 const createGateway = (gateways) => new ApolloGateway({
   serviceList: Object.entries(gateways)
@@ -26,6 +43,14 @@ const server = new ApolloServer({
   gateway: createGateway(gateways),
   subscriptions: false
 })
+
+if (shouldChallenge(process))
+  app.use(basicAuth({
+    users: {
+      [path(['env','HTTP_USER'], process)]: path(['env', 'HTTP_PASS'], process)
+    },
+    challenge: true,
+  }))
 
 server.applyMiddleware({ app, path: '/' })
 
