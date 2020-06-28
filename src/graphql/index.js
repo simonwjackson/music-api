@@ -1,59 +1,81 @@
-import process from 'process'
-import express from 'express'
-import { ApolloServer } from 'apollo-server-express' 
 import { ApolloGateway } from '@apollo/gateway'
-import * as gateways from './gateways' 
-import { anyPass, pathSatisfies, complement, isEmpty, isNil, allPass, path, pathOr } from 'ramda'
+import { ApolloServer } from 'apollo-server-express' 
+import express from 'express'
 import basicAuth from 'express-basic-auth'
+import process from 'process'
+import {
+  allPass,
+  anyPass,
+  complement,
+  isEmpty,
+  isNil,
+  path,
+  pathSatisfies,
+  pipe, 
+  tap,
+} from 'ramda'
 
-const port = pathOr(4000, ['env','PORT'], process)
+import * as gateways from './gateways' 
+
+const port = path(['env', 'PORT'], process) || 4000
 const app = express()
-const notEmpty = complement(isEmpty)
-const notNil = complement(isNil)
-const notFalsy = anyPass([
-  notEmpty,
-  notNil
+const allFail = conditionals => 
+  obj => 
+    !allPass(conditionals)(obj)
+const isFalsy = anyPass([
+  isEmpty,
+  isNil,
 ])
 
-const shouldChallenge = process =>
-  process
-    |> path(['env'], #)
-    |> allPass([
-      pathSatisfies(notFalsy, ['HTTP_USER']),
-      pathSatisfies(notFalsy, ['HTTP_PASS'])
-    ])(#)
+const shouldChallenge = process => 
+  pipe(
+    path(['env']),
+    allFail([
+      pathSatisfies(isFalsy, ['HTTP_USER']),
+      pathSatisfies(isFalsy, ['HTTP_PASS']),
+    ]),
+  )(process)
 
-const createGateway = (gateways) => new ApolloGateway({
-  serviceList: Object.entries(gateways)
-    .map(([key, val]) => {
-      (new ApolloServer(val)).applyMiddleware({ app, path: `/${key}` }) 
+const createGateway = gateways => 
+  new ApolloGateway({
+    serviceList: Object.entries(gateways) 
+      .map(([key, val]) => {
+      /* eslint-disable-next-line fp/no-unused-expression */
+        (new ApolloServer(val)).applyMiddleware({
+          app,
+          path: `/${key}`, 
+        }) 
 
-      return {
-        name: key,
-        url: `http://localhost:${port}/${key}` 
-      }
-    })
-})
+        return {
+          name: key,
+          url: `http://localhost:${port}/${key}`, 
+        }
+      }), 
+  })
 
 const server = new ApolloServer({
   cors: {
     origin: '*',
-    credentials: false
+    credentials: false,
   }, 
   gateway: createGateway(gateways),
-  subscriptions: false
+  subscriptions: false,
 })
 
-if (shouldChallenge(process))
+if (shouldChallenge(process)) 
+  /* eslint-disable-next-line fp/no-unused-expression */
   app.use(basicAuth({
-    users: {
-      [path(['env','HTTP_USER'], process)]: path(['env', 'HTTP_PASS'], process)
-    },
+    users: { [path(['env', 'HTTP_USER'], process)]: path(['env', 'HTTP_PASS'], process) },
     challenge: true,
   }))
 
-server.applyMiddleware({ app, path: '/' })
+/* eslint-disable-next-line fp/no-unused-expression */
+server.applyMiddleware({
+  app,
+  path: '/', 
+})
 
+/* eslint-disable-next-line fp/no-unused-expression */
 app.listen({ port }, () =>
-  console.log(`🚀 Server ready at http://localhost:${port}${server.graphqlPath}`)
+  console.log(`🚀 Server ready at http://localhost:${port}${server.graphqlPath}`),
 )

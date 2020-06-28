@@ -1,7 +1,14 @@
 {
-    "presets": ["@babel/preset-env"],
+    "presets": [
+      "@babel/preset-env",
+    ],
     "plugins": [
+      ["module-resolver", {
+        "root": ["./src"],
+        "alias": {
+          "test": "./test",
+        }
+      }],
       ["@babel/plugin-transform-runtime", { "regenerator": true }],
-      ["@babel/plugin-proposal-pipeline-operator", { "proposal": "smart" }]
     ]
 }

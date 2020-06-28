@@ -23,16 +23,21 @@
     "ytpl": "^0.1.21"
   },
   "devDependencies": {
-    "@babel/cli": "^7.8.4",
-    "@babel/core": "^7.9.6",
+    "@babel/cli": "^7.10.3",
+    "@babel/core": "^7.10.3",
     "@babel/node": "^7.8.7",
-    "@babel/plugin-proposal-pipeline-operator": "^7.8.3",
     "@babel/plugin-transform-runtime": "^7.10.1",
-    "@babel/preset-env": "^7.9.6",
+    "@babel/preset-env": "^7.10.3",
     "babel-eslint": "^11.0.0-beta.0",
+    "babel-plugin-module-resolver": "^4.0.0",
     "calver": "^20.5.2",
     "concurrently": "^5.2.0",
-    "eslint": "^7.0.0",
+    "eslint": "^7.3.1",
+    "eslint-import-resolver-babel-module": "^5.1.2",
+    "eslint-plugin-fp": "^2.3.0",
+    "eslint-plugin-import": "^2.22.0",
+    "eslint-plugin-modules-newline": "0.0.4",
+    "eslint-plugin-simple-import-sort": "^5.0.3",
     "nodemon": "^2.0.3"
   },
   "scripts": {

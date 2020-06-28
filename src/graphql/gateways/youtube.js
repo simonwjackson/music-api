@@ -1,20 +1,26 @@
-import { ApolloServer, gql } from 'apollo-server'
-const { buildFederatedSchema } = require('@apollo/federation')
-const fetch = require('node-fetch')
-const storage = require('node-persist') 
-const {
-  GraphQLObjectType,
-  GraphQLSchema,
-} = require('graphql') 
-const {
-  GraphQLDate,
-  GraphQLTime,
-  GraphQLDateTime
-} = require('graphql-iso-date')
-
-const { httpRequest } = require('../../utils') 
-import { concat, pathEq, ascend, descend, when, take, map, complement, isNil,mergeLeft, pathSatisfies, sort, filter, startsWith, nth, path } from 'ramda'
-import { log, promisify } from 'util'
+import { buildFederatedSchema } from '@apollo/federation'
+import { gql } from 'apollo-server'
+import storage from 'node-persist' 
+import {
+  andThen,
+  ascend,
+  complement,
+  concat,
+  descend,
+  filter,
+  isNil,
+  map,
+  mergeLeft,
+  path,
+  pathEq,
+  pathSatisfies,
+  pipe,
+  sort,
+  startsWith,
+  take,
+  when 
+} from 'ramda'
+import { promisify } from 'util'
 import ytdl from 'ytdl-core' 
 import ytplCB from 'ytpl' 
 
@@ -22,31 +28,29 @@ const ytpl = promisify(ytplCB)
 const notNil = complement(isNil)
 const notStartsWith = complement(startsWith)
 
-const onlyAudio = list =>
-  list
-    |> filter(pathSatisfies(startsWith('audio/'), ['mimeType']), #)
+// const onlyAudio = list =>
+//   list
+//     |> filter(pathSatisfies(startsWith('audio/'), ['mimeType']), #)
 
-const getYoutubeItem = async youtubeItem =>
-  youtubeItem
-    |> path(['url_simple'], #)
-    |> ytdl.getInfo(#, {
-      quality: 'highestaudio',
-      filter: 'audioonly'
-    })
-    |> await #
-    |> mergeLeft(youtubeItem, #)
+const getYoutubeItem = youtubeItem => 
+  pipe(
+    path(['url_simple']),
+    url => 
+      ytdl.getInfo(url, {
+        quality: 'highestaudio',
+        filter: 'audioonly'
+      }),
+    andThen(mergeLeft(youtubeItem))
+  )(youtubeItem)
 
 // |> path(['formats'], #)
 // |> onlyAudio(#)
 
-const port = 30004
-
+/* eslint-disable-next-line fp/no-unused-expression */
 storage.init({
   dir: './db',
   // logging: (...args) => console.log(...args),
 })
-
-let memo = {}
 
 const typeDefs = gql`
 	scalar Date
@@ -108,28 +112,34 @@ const typeDefs = gql`
 
 const resolvers = {
   Query: {
-    youtubePlaylist: async (parent, args, ctx, info) => 
-      args.id
-      |> when(notStartsWith('https://'), id => concat('https://www.youtube.com/playlist?list=', id), #)
-      |> ytpl(#)
+    youtubePlaylist: (parent, args) => 
+      pipe(
+        when(
+          notStartsWith('https://'),
+          id => 
+            concat('https://www.youtube.com/playlist?list=', id)
+        ),
+        ytpl
+      )(args.id)
   },
 
   YoutubeItem: {
-    formats: async (parent, args, ctx, info) => {
-      return parent
-        |> path(['formats'], #)
-        |> when(
-          () => pathSatisfies(notNil, ['type'], args),
+    formats: (parent, args) => 
+      pipe(
+        path(['formats']),
+        when(
+          () => 
+            pathSatisfies(notNil, ['type'], args),
           filter(pathSatisfies(startsWith(path(['type'], args) + '/'), ['mimeType'])),
-          #
-        )
-        |> when(
-          () => pathSatisfies(notNil, ['limit'], args),
+        ),
+        when(
+          () => 
+            pathSatisfies(notNil, ['limit'], args),
           take(path(['limit'], args)),
-          #
-        )
-        |> when(
-          () => pathSatisfies(notNil, ['sort', 'order'], args),
+        ),
+        when(
+          () => 
+            pathSatisfies(notNil, ['sort', 'order'], args),
           list => {
             const field = path(['sort', 'field'], args)
 
@@ -138,22 +148,20 @@ const resolvers = {
         
             return sort(ascend(path([field])), list) 
           },
-          #
         )
-    }
+      )(parent)
   },
 
   YoutubePlaylist: {
-    __resolveReference: async (ref) => ytpl(ref.id),
+    __resolveReference: async ref => 
+      ytpl(ref.id),
 
-    items: async (parent, args, ctx, info) => {
-      return parent
-        |> path(['items'], #)
-        |> map(getYoutubeItem, #)
-    },
+    items: parent => 
+      pipe(
+        path(['items']),
+        map(getYoutubeItem),
+      )(parent)
   },
 }
 
-export default {
-  schema: buildFederatedSchema({ typeDefs, resolvers })
-}
+export default { schema: buildFederatedSchema({ typeDefs, resolvers }) }

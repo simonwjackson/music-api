@@ -1,25 +1,35 @@
-import { map, flip, tap, curry, assoc, prop, dissoc, when, complement, isNil } from 'ramda'
 import https from 'https'
+import {
+  assoc,
+  complement,
+  curry,
+  dissoc,
+  flip,
+  isNil,
+  map,
+  prop,
+  tap,
+  when 
+} from 'ramda'
 
-export const httpRequest = (url) => {
-  return new Promise(function(resolve) {
-    https.get(url, (resp) => {
+export const httpRequest = url => {
+  return new Promise(resolve => 
+    https.get(url, resp => {
+      /* eslint-disable-next-line fp/no-let */
       let data = ''
 
       // A chunk of data has been recieved.
-      resp.on('data', (chunk) => {
-        data += chunk
-      })
+      /* eslint-disable-next-line fp/no-unused-expression, fp/no-mutation */
+      resp.on('data', chunk => data += chunk)
 
       // The whole response has been received. Print out the result.
-      resp.on('end', () => {
-        resolve(data)
-      })
+      /* eslint-disable-next-line fp/no-unused-expression, fp/no-mutation */
+      resp.on('end', () => resolve(data))
 
-    }).on('error', (err) => {
-      console.log('Error: ' + err.message)
-    }) 
-  })
+      return true 
+    }).on('error', err => console.log('Error: ' + err.message)
+    ) 
+  )
 }
 
 export const logger = tap(console.log)

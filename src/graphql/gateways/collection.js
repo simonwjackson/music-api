@@ -1,5 +1,5 @@
-const { gql } = require('apollo-server')
-const { buildFederatedSchema } = require('@apollo/federation')
+import { buildFederatedSchema } from '@apollo/federation'
+import { gql } from 'apollo-server'
 
 const typeDefs = gql`
   type Collection {
@@ -26,11 +26,11 @@ const resolvers = {
   //     return collection.releaseGroups
   //   },
   // },
+
   Query: {
-    collections: () => collections 
+    collections: () => 
+      collections 
   }
 }
 
-export default {
-  schema: buildFederatedSchema({ typeDefs, resolvers })
-}
+export default { schema: buildFederatedSchema({ typeDefs, resolvers }) }

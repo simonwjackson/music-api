@@ -1,17 +1,20 @@
-import { mapFrom, logger } from '../../utils'
-const { ApolloServer, gql } = require('apollo-server') 
-const { map, path, pick } = require('ramda')
-const { buildFederatedSchema } = require('@apollo/federation')
-const fetch = require('node-fetch')
-const { MusicBrainzApi } = require('musicbrainz-api')
-const Bottleneck = require('bottleneck')
-const storage = require('node-persist')
+import { buildFederatedSchema }  from '@apollo/federation'
+import { gql } from 'apollo-server' 
+import Bottleneck  from 'bottleneck'
+import { MusicBrainzApi } from 'musicbrainz-api'
+import storage from 'node-persist'
+import {
+  andThen,
+  map,
+  path,
+  pipe,
+} from 'ramda'
 
-const init = async () => {
-  await storage.init({
-    dir: './musicbrainz.cache'
-  })
-}
+/* eslint-disable-next-line fp/no-nil */
+const init = async () => 
+  await storage.init({ dir: './musicbrainz.cache' })
+
+/* eslint-disable-next-line fp/no-unused-expression, fp/no-nil */
 init()
 // await storage.setItem('name','yourname')
 
@@ -25,8 +28,6 @@ const mbApi = new MusicBrainzApi({
   appVersion: '0.1.0',
   appContactInfo: 'simon@simonwjackson.com'
 })
-
-const port = 30002
 
 const typeDefs = gql`
   type MusicBrainzArtist @key(fields: "id") {
@@ -95,77 +96,75 @@ const typeDefs = gql`
 
 const resolvers = {
   Track: {
-    recording: (track) => {
-      return limiter.schedule(() => mbApi.getRecording(track.recording.id, [
-        'artists',
-        'releases',
-        // 'recordings',
-        'artists',
-        'artist-credits',
-        'isrcs',
-        'url-rels',
-        'release-groups',
-        'aliases',
-        'discids',
-        'annotation',
-        'media',
-        'area-rels',
-        'artist-rels',
-        'event-rels',
-        'instrument-rels',
-        'label-rels',
-        'place-rels',
-        'recording-rels',
-        'release-rels',
-        'release-group-rels',
-        'series-rels',
-        'url-rels',
-        'work-rels' 
-      ]).then(r => {
-        console.log(r)
-        return r
-      }))
-    }
+    recording: track => 
+      limiter.schedule(() => 
+        mbApi.getRecording(track.recording.id, [
+          'artists',
+          'releases',
+          // 'recordings',
+          'artists',
+          'artist-credits',
+          'isrcs',
+          'url-rels',
+          'release-groups',
+          'aliases',
+          'discids',
+          'annotation',
+          'media',
+          'area-rels',
+          'artist-rels',
+          'event-rels',
+          'instrument-rels',
+          'label-rels',
+          'place-rels',
+          'recording-rels',
+          'release-rels',
+          'release-group-rels',
+          'series-rels',
+          'url-rels',
+          'work-rels' 
+        ]).then(r => 
+          r))
   },
 
   MusicBrainzRelease: {
-    __resolveReference: async (ref) => {
-      return limiter.schedule(() => mbApi.getRelease(ref.id, [
-        'artists',
-        // 'releases',
-        'recordings',
-        'artists',
-        'artist-credits',
-        'isrcs',
-        'url-rels',
-        'release-groups',
-        'aliases',
-        'discids',
-        'annotation',
-        'media',
-        'area-rels',
-        'artist-rels',
-        'event-rels',
-        'instrument-rels',
-        'label-rels',
-        'place-rels',
-        'recording-rels',
-        'release-rels',
-        'release-group-rels',
-        'series-rels',
-        'url-rels',
-        'work-rels' 
-      ]).then(r => {
+    __resolveReference: async ref => 
+      limiter.schedule(() => 
+        mbApi.getRelease(ref.id, [
+          'artists',
+          // 'releases',
+          'recordings',
+          'artists',
+          'artist-credits',
+          'isrcs',
+          'url-rels',
+          'release-groups',
+          'aliases',
+          'discids',
+          'annotation',
+          'media',
+          'area-rels',
+          'artist-rels',
+          'event-rels',
+          'instrument-rels',
+          'label-rels',
+          'place-rels',
+          'recording-rels',
+          'release-rels',
+          'release-group-rels',
+          'series-rels',
+          'url-rels',
+          'work-rels' 
+        ]).then(r => 
         // console.log(r.media[0].tracks)
-        return r
-      }))
-    },
+          r
+        )),
 
-    artists: async (parent, args, ctx, info) => {
-      return parent
-       |> path(['artist-credit'], #)
-       |> map(path(['artist']), #)
-    }, 
+    artists: parent => 
+      pipe(
+        path(['artist-credit']),
+        map(path(['artist'])), 
+      )(parent)
   },
 
   // ReleaseGroup: {
@@ -187,45 +186,39 @@ const resolvers = {
   // },
 
   Query: {
-    musicBrainzRelease: async (a,s,d,f) => {
-      console.log(s.id)
-
-      return mbApi.getRelease(s.id, [
+    musicBrainzRelease: async (a, s) => 
+      mbApi.getRelease(s.id, [
         'artists',
-        // 'recordings',
-        // 'artists',
-        // 'artist-credits',
-        // 'isrcs',
-        // 'url-rels',
-        // 'release-groups',
-        // 'aliases',
-        // 'discids',
-        // 'annotation',
-        // 'media',
-        // 'area-rels',
-        // 'artist-rels',
-        // 'event-rels',
-        // 'instrument-rels',
-        // 'label-rels',
-        // 'place-rels',
-        // 'recording-rels',
-        // 'release-rels',
-        // 'release-group-rels',
-        // 'series-rels',
-        // 'url-rels',
-        // 'work-rels'
-      ])
-      |> await #
-      |> logger(#)
-    }, 
-    musicBrainzReleases: async (a,s) => {
-      return mbApi.searchReleaseGroup(s.query)
-        |> await #
-        |> path(['release-groups'], #)
-    }
+      // 'recordings',
+      // 'artists',
+      // 'artist-credits',
+      // 'isrcs',
+      // 'url-rels',
+      // 'release-groups',
+      // 'aliases',
+      // 'discids',
+      // 'annotation',
+      // 'media',
+      // 'area-rels',
+      // 'artist-rels',
+      // 'event-rels',
+      // 'instrument-rels',
+      // 'label-rels',
+      // 'place-rels',
+      // 'recording-rels',
+      // 'release-rels',
+      // 'release-group-rels',
+      // 'series-rels',
+      // 'url-rels',
+      // 'work-rels'
+      ]),
+
+    musicBrainzReleases: async (a, s) => 
+      pipe(
+        mbApi.searchReleaseGroup,
+        andThen(path(['release-groups']))
+      )(s.query)
   }
 }
 
-export default {
-  schema: buildFederatedSchema({ typeDefs, resolvers })
-}
+export default { schema: buildFederatedSchema({ typeDefs, resolvers }) }

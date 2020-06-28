@@ -1,8 +1,26 @@
 // TODO: Write bandcamp regex
 // TODO: Write google html fetcher
 
-import { tail, test, map, trim, zipObj, mergeDeepLeft, omit, nth, pick, split, find, path } from 'ramda'
-import { whenFound, renameKey } from '../utils'
+import {
+  pipe,
+  // find,
+  // map,
+  // mergeDeepLeft,
+  // nth,
+  // omit,
+  // path,
+  // pick,
+  // split,
+  tail,
+  // test,
+  // trim,
+  // zipObj
+} from 'ramda'
+
+// import {
+//   renameKey,
+//   whenFound
+// } from 'utils'
 
 const linkRegEx = /<div class=\\"r\\"><a href=\\"(https:\/\/.+?.bandcamp.com\/album\/.+?)\\" onmousedown/g
 
@@ -26,10 +44,12 @@ const linkRegEx = /<div class=\\"r\\"><a href=\\"(https:\/\/.+?.bandcamp.com\/al
 //     |> path(['link'], #)
 //     |> test(/\.bandcamp\.com\/album\//, #)
 
-export const bandcamp = html =>
-  html
-    |> linkRegEx.exec(#) 
-    |> tail(#)
-    // |> path(['organic_results'], #)
-    // |> find(isBandcampLink, #)
-    // |> whenFound(mapBandcampItem, #)
+export const bandcamp = html => 
+  pipe(
+    linkRegEx.exec,
+    tail
+  )(html)
+
+// |> path(['organic_results'], #)
+// |> find(isBandcampLink, #)
+// |> whenFound(mapBandcampItem, #)

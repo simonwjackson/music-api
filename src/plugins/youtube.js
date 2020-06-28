@@ -1,5 +1,28 @@
-import { when, tail, nth, match, tap, pathEq, test, map, trim, zipObj, mergeDeepLeft, omit, pick, split, find, path } from 'ramda'
-import { whenFound, logger, renameKey } from '../utils'
+import {
+  pipe,
+  tail,
+  tap
+  // find,
+  // map,
+  // match,
+  // mergeDeepLeft,
+  // nth,
+  // omit,
+  // path,
+  // pathEq,
+  // pick,
+  // split,
+  // tap,
+  // test,
+  // trim,
+  // when,
+  // zipObj
+} from 'ramda'
+import {
+  // logger,
+  // renameKey,
+  whenFound 
+} from 'utils'
 
 // const linkRegEx = /mu(s)ic/gm
 const linkRegEx = /<a href="(https:\/\/music.youtube.com\/playlist\?.+?)&amp;feature=gws_kp_album.+?" /g
@@ -23,11 +46,14 @@ const linkRegEx = /<a href="(https:\/\/music.youtube.com\/playlist\?.+?)&amp;fea
 // const isYoutubeKG = entry =>
 //   entry
 //     |> pathEq(['name'], 'YouTube Music', #)
-//
-export const youtube = html =>
-  html
-    |> linkRegEx.exec(#)
-    |> whenFound(tail, #)
-    // |> path(['knowledge_graph', 'available_on'], #)
-    // |> find(isYoutubeKG, #)
-    // |> whenFound(createResultObj(payload), #)
+
+export const youtube = html => 
+  pipe(
+    x => 
+      linkRegEx.exec(x),
+    whenFound(tail),
+  )(html)
+
+// |> path(['knowledge_graph', 'available_on'], #)
+// |> find(isYoutubeKG, #)
+// |> whenFound(createResultObj(payload), #)

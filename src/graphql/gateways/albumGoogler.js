@@ -1,33 +1,39 @@
 // TODO: youtube sometimes returns null
-import googleIt from 'google-it'
+import { buildFederatedSchema } from '@apollo/federation'
+import { gql } from 'apollo-server'
 import Bottleneck from 'bottleneck'
-import { promisify } from 'util'
-import { tap, applySpec, pathEq, ascend, descend, when, take, map, complement, isNil,mergeLeft, pathSatisfies, sort, filter, startsWith, nth, path } from 'ramda'
-import { join } from 'path'
-import fs from 'fs'
-import { ApolloServer, gql } from 'apollo-server'
-import { bandcamp } from '../../plugins/bandcamp'
-import { youtube } from '../../plugins/youtube'
-const { buildFederatedSchema } = require('@apollo/federation')
-const storage = require('node-persist') 
-const {
-  GraphQLObjectType,
-  GraphQLSchema,
-} = require('graphql') 
-const {
-  GraphQLDate,
-  GraphQLTime,
-  GraphQLDateTime
-} = require('graphql-iso-date')
+import googleIt from 'google-it'
+import storage from 'node-persist' 
+// import { bandcamp } from 'plugins/bandcamp'
+import { youtube } from 'plugins/youtube'
+import {
+  andThen,
+  applySpec,
+  // ascend,
+  // complement,
+  // descend,
+  // filter,
+  // isNil,
+  map,
+  // mergeLeft,
+  // nth,
+  path,
+  pipe, 
+  // pathEq,
+  // pathSatisfies,
+  // sort,
+  // startsWith,
+  // take,
+  tap,
+  // when
+} from 'ramda'
+import { whenFound } from 'utils' 
 
-const { httpRequest, logger, whenFound } = require('../../utils') 
-
-const port = 30005 
+/* eslint-disable-next-line fp/no-unused-expression */
 storage.init({
   dir: './googler',
   // logging: (...args) => console.log(...args),
 })
-const readFile = promisify(fs.readFile)
 
 const plugins = {
   // bandcamp,
@@ -39,17 +45,17 @@ const limiter = new Bottleneck({
   minTime: 30 * 1000
 }) 
 
+/* eslint-disable-next-line fp/no-rest-parameters */
 const limitedGoogler = async (...args) => {
   const cache = await storage.getItem(args[0].query)
-  if (cache) {
-    console.log('grabbing cache')
-    return cache
-  }
+  if (cache) return cache
 
-  return limiter.wrap(googleIt)(...args)
-    |> await #
-    |> path(['body'], #)
-    |> tap(html => storage.setItem(args[0].query, html), #) 
+  return pipe(
+    limiter.wrap(googleIt),
+    andThen(path(['body'])),
+    andThen(tap(html => 
+      storage.setItem(args[0].query, html))) 
+  )(...args)
 }
 
 const typeDefs = gql`
@@ -70,21 +76,21 @@ const typeDefs = gql`
 
 const resolvers = {
   Query: {
-    albumGoogler: async (parent, args, ctx, info) => {
-      return limitedGoogler({
+    albumGoogler: async (parent, args) => 
+      pipe(
+        limitedGoogler,
+        andThen(applySpec(plugins))
+      )({
         query: args.query,
         returnHtmlBody: true
       })
-       |> await #
-       |> applySpec(plugins)(#)
-    }
   },
 
   GoogleAlbumResult: {
-    youtube: async ({ youtube }) => whenFound(map(id => ({ id })), youtube)
+    youtube: async ({ youtube }) => 
+      whenFound(map(id => 
+        ({ id })), youtube)
   }
 }
 
-export default {
-  schema: buildFederatedSchema({ typeDefs, resolvers })
-}
+export default { schema: buildFederatedSchema({ typeDefs, resolvers }) }

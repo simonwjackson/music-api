@@ -1,29 +1,18 @@
-const { ApolloServer, gql } = require('apollo-server')
-const { buildFederatedSchema } = require('@apollo/federation')
-const fetch = require('node-fetch')
-const storage = require('node-persist') 
-const {
-  GraphQLObjectType,
-  GraphQLSchema,
-} = require('graphql') 
-const {
-  GraphQLDate,
-  GraphQLTime,
-  GraphQLDateTime
-} = require('graphql-iso-date')
+import { buildFederatedSchema } from '@apollo/federation'
+import { gql } from 'apollo-server'
+import storage from 'node-persist' 
+import { httpRequest } from 'utils'
 
-const { httpRequest } = require('../../utils') 
-
-const port = 30003
-
+/* eslint-disable-next-line fp/no-unused-expression */
 storage.init({
   dir: './db',
   // logging: (...args) => console.log(...args),
 })
 
+/* eslint-disable-next-line fp/no-let */
 let memo = {}
 
-const getBandcampMetaData = async (url) => {
+const getBandcampMetaData = async url => {
   if (memo[url]) return memo[url]
 
   const data = await httpRequest(url)
@@ -32,6 +21,7 @@ const getBandcampMetaData = async (url) => {
   const EmbedData = new Function('return ' + (/var EmbedData = ([\s\S]*?)};/).exec(data)[1] + '}')()
   const TralbumData = new Function('return ' + (/var TralbumData = ([\s\S]*?)};/).exec(data)[1] + '}')()
 
+  /* eslint-disable-next-line fp/no-mutation */
   memo[url] = ({
     BandData,
     EmbedData,
@@ -83,21 +73,20 @@ const typeDefs = gql`
 
 const resolvers = {
   Query: {
-    bandcampArtist: async (parent, args, ctx, info) => {
-      return {
-        name: data.BandData.name,
-      }
-    },
+    bandcampArtist: async (parent, args, ctx, info) => 
+      ({ name: data.BandData.name }),
 
-    bandcampArtists: async (parent, args, ctx, info) => {
+    bandcampArtists: async (parent, args) => {
       const url = `https://bandcamp.com/api/fuzzysearch/1/autocomplete?q=${args.query}`
       const data = await httpRequest(url).then(JSON.parse)
       return data.auto.results
-        .filter(r => r.type === 'b')
-        .filter(r => !r.is_label)
+        .filter(r => 
+          r.type === 'b')
+        .filter(r => 
+          !r.is_label)
     },
 
-    bandcampAlbum: async (parent, args, ctx, info) => {
+    bandcampAlbum: async (parent, args) => {
       const data = await getBandcampMetaData(args.albumUrl)
 
       return {
@@ -107,12 +96,14 @@ const resolvers = {
       }
     },
 
-    bandcampAlbums: async (parent, args, ctx, info) => {
+    bandcampAlbums: async (parent, args) => {
       const url = `https://bandcamp.com/api/fuzzysearch/1/autocomplete?q=${args.query}`
       const data = await httpRequest(url).then(JSON.parse)
       return data.auto.results
-        .filter(r => r.type === 'a')
-        .filter(r => !r.is_label)
+        .filter(r => 
+          r.type === 'a')
+        .filter(r => 
+          !r.is_label)
     },
 
   },
@@ -120,30 +111,26 @@ const resolvers = {
   BandcampArtist: {
     albums(parent, args, ctx, info) { 
       return [
-        {
-          name: 'I AM ALBIM' 
-        }
+        { name: 'I AM ALBIM' }
       ]
     }
   },
 
   BandcampAlbum: {
-    tracks : async (parent, args, ctx, info) => { 
-      return parent.tracks.map(item => ({
-        track: item.track_num,
-        duration: parseInt(item.duration),
-        trackId: item.track_id,
-        title: item.title,
-        file: {
-          url: item.file['mp3-128'],
-          bitrate: 128,
-          encoding: 'mp3'
-        },
-      }))
-    }
+    tracks : async parent => 
+      parent.tracks.map(item => 
+        ({
+          track: item.track_num,
+          duration: parseInt(item.duration),
+          trackId: item.track_id,
+          title: item.title,
+          file: {
+            url: item.file['mp3-128'],
+            bitrate: 128,
+            encoding: 'mp3'
+          },
+        }))
   }
 }
 
-export default {
-  schema: buildFederatedSchema({ typeDefs, resolvers })
-}
+export default { schema: buildFederatedSchema({ typeDefs, resolvers }) }

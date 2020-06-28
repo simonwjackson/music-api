@@ -1,0 +1,99 @@
+---
+root: true
+env:
+  commonjs: true
+  es6: true
+  node: true
+extends: 
+  - eslint:recommended
+  - plugin:import/errors
+parserOptions:
+  ecmaVersion: 2018
+globals:
+  Atomics: readonly
+  SharedArrayBuffer: readonly
+parser: babel-eslint
+plugins:
+  - fp
+  - simple-import-sort
+  - modules-newline
+settings:
+  import/resolver:
+    babel-module: {}
+rules:
+  # FP
+  fp/no-arguments: error
+  fp/no-class: error
+  fp/no-delete: error
+  fp/no-events: error
+  fp/no-get-set: error
+  fp/no-let: error
+  fp/no-loops: error
+  fp/no-mutating-assign: error
+  fp/no-mutating-methods: error
+  fp/no-mutation: error
+  fp/no-nil: error
+  fp/no-proxy: error
+  fp/no-rest-parameters: error
+  fp/no-this: error
+  fp/no-throw: error
+  fp/no-unused-expression: error
+  fp/no-valueof-field: error
+  no-var: error
+
+  object-curly-newline: 
+    - error
+    - minProperties: 3
+      multiline: true 
+  comma-dangle: 
+    - error
+    - only-multiline
+  func-style: 
+    - error
+    - expression
+  arrow-parens: 
+    - error
+    - as-needed
+
+  comma-spacing: 
+    - error
+    - before: false
+      after: true 
+
+  arrow-body-style: 
+    - error
+    - as-needed
+  modules-newline/import-declaration-newline: error
+  modules-newline/export-declaration-newline: error
+  simple-import-sort/sort: error
+  space-infix-ops: error
+  object-curly-spacing:
+  - error
+  - always
+  curly:
+  - error
+  - multi
+  - consistent
+  quote-props:
+  - error
+  - as-needed
+  no-multiple-empty-lines:
+  - error
+  - max: 1
+    maxBOF: 1
+  brace-style:
+  - error
+  - stroustrup
+  indent:
+  - error
+  - 2
+  linebreak-style:
+  - error
+  - unix
+  quotes:
+  - error
+  - single
+  semi:
+  - error
+  - never
+
