@@ -1,25 +1,38 @@
 ---
 root: true
-env:
-  commonjs: true
-  es6: true
-  node: true
-extends: 
-  - eslint:recommended
-  - plugin:import/errors
+
+parser: babel-eslint
+
 parserOptions:
   ecmaVersion: 2018
+
 globals:
   Atomics: readonly
   SharedArrayBuffer: readonly
-parser: babel-eslint
-plugins:
-  - fp
+
+env:
+  jest/globals: true
+  commonjs: true
+  es6: true
+  node: true
+
+plugins: 
+  - unused-imports
   - simple-import-sort
+  - jest
+  - fp
   - modules-newline
+  - import
+
+extends: 
+  - eslint:recommended
+  - plugin:import/errors
+  - plugin:jest/all
+
 settings:
   import/resolver:
     babel-module: {}
+
 rules:
   # FP
   fp/no-arguments: error
@@ -31,7 +44,9 @@ rules:
   fp/no-loops: error
   fp/no-mutating-assign: error
   fp/no-mutating-methods: error
-  fp/no-mutation: error
+  fp/no-mutation:
+  - error
+  - commonjs: true
   fp/no-nil: error
   fp/no-proxy: error
   fp/no-rest-parameters: error
@@ -40,6 +55,19 @@ rules:
   fp/no-unused-expression: error
   fp/no-valueof-field: error
   no-var: error
+
+  # Jest
+  jest/no-disabled-tests: warn
+  jest/no-focused-tests: error
+  jest/no-identical-title: error
+  jest/prefer-to-have-length: warn
+  jest/valid-expect: error 
+
+  # Imports
+  modules-newline/import-declaration-newline: error
+  modules-newline/export-declaration-newline: error
+  simple-import-sort/sort: error
+  unused-imports/no-unused-imports: error
 
   object-curly-newline: 
     - error
@@ -63,9 +91,6 @@ rules:
   arrow-body-style: 
     - error
     - as-needed
-  modules-newline/import-declaration-newline: error
-  modules-newline/export-declaration-newline: error
-  simple-import-sort/sort: error
   space-infix-ops: error
   object-curly-spacing:
   - error
@@ -77,16 +102,9 @@ rules:
   quote-props:
   - error
   - as-needed
-  no-multiple-empty-lines:
-  - error
-  - max: 1
-    maxBOF: 1
   brace-style:
   - error
   - stroustrup
-  indent:
-  - error
-  - 2
   linebreak-style:
   - error
   - unix
@@ -96,4 +114,45 @@ rules:
   semi:
   - error
   - never
+  eol-last:
+  - error
+  - always
+  padding-line-between-statements:
+  - error
+  - blankLine: always
+    prev: function
+    next: function
+  - blankLine: always
+    prev: "*"
+    next: return
+  - blankLine: always
+    prev:
+    - const
+    - let
+    - var
+    next: "*"
+  - blankLine: any
+    prev:
+    - const
+    - let
+    - var
+    next:
+    - const
+    - let
+    - var
+  no-multiple-empty-lines:
+  - error
+  - max: 2
+    maxEOF: 1
+  indent:
+  - error
+  - 2
+
+overrides:
+- files:
+  - "*.test.js"
+  - "*.spec.js"
+  rules:
+    fp/no-unused-expression: off
+    fp/no-nil: off 
 

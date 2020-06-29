@@ -3,38 +3,13 @@ import { ApolloServer } from 'apollo-server-express'
 import express from 'express'
 import basicAuth from 'express-basic-auth'
 import process from 'process'
-import {
-  allPass,
-  anyPass,
-  complement,
-  isEmpty,
-  isNil,
-  path,
-  pathSatisfies,
-  pipe, 
-  tap,
-} from 'ramda'
+import { path } from 'ramda'
 
 import * as gateways from './gateways' 
+import { shouldChallenge } from './utils'
 
 const port = path(['env', 'PORT'], process) || 4000
 const app = express()
-const allFail = conditionals => 
-  obj => 
-    !allPass(conditionals)(obj)
-const isFalsy = anyPass([
-  isEmpty,
-  isNil,
-])
-
-const shouldChallenge = process => 
-  pipe(
-    path(['env']),
-    allFail([
-      pathSatisfies(isFalsy, ['HTTP_USER']),
-      pathSatisfies(isFalsy, ['HTTP_PASS']),
-    ]),
-  )(process)
 
 const createGateway = gateways => 
   new ApolloGateway({

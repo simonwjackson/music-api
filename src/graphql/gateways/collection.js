@@ -1,7 +1,7 @@
 import { buildFederatedSchema } from '@apollo/federation'
 import { gql } from 'apollo-server'
 
-const typeDefs = gql`
+export const typeDefs = gql`
   type Collection {
     id: ID!
     releases: [MusicBrainzRelease]

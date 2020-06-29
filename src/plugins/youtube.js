@@ -1,7 +1,6 @@
 import {
   pipe,
-  tail,
-  tap
+  tail
   // find,
   // map,
   // match,
@@ -47,10 +46,19 @@ const linkRegEx = /<a href="(https:\/\/music.youtube.com\/playlist\?.+?)&amp;fea
 //   entry
 //     |> pathEq(['name'], 'YouTube Music', #)
 
+
+const execRegex = regex => data =>
+  regex.exec(data)
+
+
+/**
+ * @param {string} html - The HTML to parse
+ * @return {string|null} A url
+ */
+
 export const youtube = html => 
   pipe(
-    x => 
-      linkRegEx.exec(x),
+    execRegex(linkRegEx),
     whenFound(tail),
   )(html)
 

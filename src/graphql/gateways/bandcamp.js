@@ -79,6 +79,7 @@ const resolvers = {
     bandcampArtists: async (parent, args) => {
       const url = `https://bandcamp.com/api/fuzzysearch/1/autocomplete?q=${args.query}`
       const data = await httpRequest(url).then(JSON.parse)
+
       return data.auto.results
         .filter(r => 
           r.type === 'b')
@@ -99,6 +100,7 @@ const resolvers = {
     bandcampAlbums: async (parent, args) => {
       const url = `https://bandcamp.com/api/fuzzysearch/1/autocomplete?q=${args.query}`
       const data = await httpRequest(url).then(JSON.parse)
+
       return data.auto.results
         .filter(r => 
           r.type === 'a')

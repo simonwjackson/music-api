@@ -48,6 +48,7 @@ const limiter = new Bottleneck({
 /* eslint-disable-next-line fp/no-rest-parameters */
 const limitedGoogler = async (...args) => {
   const cache = await storage.getItem(args[0].query)
+
   if (cache) return cache
 
   return pipe(
