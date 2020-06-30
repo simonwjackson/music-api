@@ -20,7 +20,7 @@ const collections = [
   { id: 'aieskchsd', releases: [{ id: '6fde285d-07ff-4173-83df-d946afeb99e8' }] }
 ]
 
-const resolvers = {
+export  const resolvers = {
   // Collection: {
   //   ReleaseGroups: (collection) => {
   //     return collection.releaseGroups

@@ -1,12 +1,3 @@
-/* eslint padding-line-between-statements: [ "error",
-    { blankLine: "always", prev: "function", next: "function" },
-    { blankLine: "always", prev: "*", next: "return" },
-    { blankLine: "always", prev: ["const", "let", "var"], next: "*"},
-    { blankLine: "any",    prev: ["const", "let", "var"], next: ["const", "let", "var"]},
-] */
-/*eslint no-multiple-empty-lines: ["error", { "max": 2, "maxEOF": 1 }]*/
-
-
 import https from 'https'
 import {
   allPass,
@@ -69,3 +60,5 @@ export const isFalsy = anyPass([
   isNil,
 ]) 
 
+
+export const notEmpty = complement(isEmpty)
