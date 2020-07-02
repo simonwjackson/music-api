@@ -44,15 +44,27 @@ export const renameKey = curry((oldKey, newKey, obj) =>
   assoc(newKey, prop(oldKey, obj), dissoc(oldKey, obj)))
 
 
+/**
+ * @param  whenTrueFn A function to invoke when the `condition` evaluates to a truthy value.
+ * @param  x An object to test with the `pred` function and pass to `whenTrueFn` if necessary.
+ * @return Either `x` or the result of applying `x` to `whenTrueFn`.  
+ *
+ * @example
+ *
+ *      const tryAdd = whenFound(a => a + 1);
+ *      tryAdd(2);         // 3
+ *      truncate(null);    // null
+ *
+ * @type {(whenTrueFn: function, x: *) => *}
+ */ 
+// @ts-ignore
 export const whenFound = when(complement(isNil))
 
 
 export const mapFrom = flip(map)
 
 
-export const allFail = conditionals => 
-  obj => 
-    !allPass(conditionals)(obj)
+export const allFail = conditionals => obj => !allPass(conditionals)(obj)
 
 
 export const isFalsy = anyPass([

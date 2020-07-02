@@ -6,7 +6,7 @@ import {
 import {
   allFail,
   isFalsy
-} from 'utils'
+} from 'utils' 
 
 
 export const shouldChallenge = process => pipe(

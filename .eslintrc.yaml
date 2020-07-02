@@ -1,7 +1,7 @@
 ---
 root: true
 
-parser: babel-eslint
+parser: '@typescript-eslint/parser'
 
 parserOptions:
   ecmaVersion: 2018
@@ -19,18 +19,27 @@ env:
 plugins: 
   - unused-imports
   - simple-import-sort
-  - jest
   - fp
   - modules-newline
   - import
+  - '@typescript-eslint'
+  - jest
 
 extends: 
   - eslint:recommended
   - plugin:import/errors
+  - plugin:@typescript-eslint/recommended
   - plugin:jest/all
 
 settings:
+  import/parsers:
+    "@typescript-eslint/parser":
+    - ".js"
+    - ".ts"
+    - ".tsx"
   import/resolver:
+    typescript:
+      alwaysTryTypes: true
     babel-module: {}
 
 rules:
@@ -155,4 +164,8 @@ overrides:
   rules:
     fp/no-unused-expression: off
     fp/no-nil: off 
-
+- files:
+  - "*.js"
+  - "*.ts"
+  rules:
+    '@typescript-eslint/ban-ts-comment': off

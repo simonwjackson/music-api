@@ -7,12 +7,11 @@ import {
 } from 'fp/apolloGateway'
 import {
   applyMiddleware,
-  createServer 
+  createServer,
 } from 'fp/apolloServer'
 import { notEmpty } from 'utils'
 
 import * as gateways from './gateways' 
-
 
 export const createApp = ({ port, users }) => {
   const app = express() 
@@ -40,3 +39,5 @@ export const createApp = ({ port, users }) => {
 
   return app 
 }
+
+createApp
