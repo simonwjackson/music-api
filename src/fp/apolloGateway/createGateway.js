@@ -1,13 +1,6 @@
-import {
-  construct,
-  path,
-  pipe
-} from 'ramda' 
+import { ApolloGateway } from '@apollo/gateway'
+import { construct } from 'ramda' 
 
-const createGateway = pipe(
-  require,
-  path(['ApolloGateway']),
-  construct
-)('@apollo/gateway')
+const createGateway = construct(ApolloGateway)
 
 export default createGateway

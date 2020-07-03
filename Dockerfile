@@ -8,4 +8,4 @@ COPY lib lib
 RUN npm ci --only=production
 
 # Code file to execute when the docker container starts up (`entrypoint.sh`)
-CMD ["node", "lib/graphql"]
+CMD ["npm", "run", "start"]

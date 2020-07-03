@@ -1,13 +1,9 @@
-import {
-  construct,
-  path,
-  pipe
-} from 'ramda'
+import { ApolloServer } from 'apollo-server-express'
+import { construct } from 'ramda'
 
-const createServer = pipe(
-  require,
-  path(['ApolloServer']),
-  construct
-)('apollo-server-express')
+/**
+ * @returns {ApolloServer}
+ */
+const createServer = construct(ApolloServer)
 
 export default createServer

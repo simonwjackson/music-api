@@ -24,11 +24,13 @@ const _createService = (app, port, [name, settings]) => pipe(
 
 const createService = curry(_createService)
 
-/* createGateway :: app -> port -> gateways -> serviceList  */
-const createServiceList = (app, port, gateways) => pipe(
-  toPairs,
-  map(createService(app, port))
-)(gateways)
+const createServiceList = curry(
+  /** @type {(app: express, port: number, gateways: []) => serviceList} */
+  (app, port, gateways) => pipe(
+    toPairs,
+    map(createService(app, port))
+  )(gateways)
+)
 
 export default curry(createServiceList)
 

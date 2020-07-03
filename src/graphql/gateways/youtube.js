@@ -133,9 +133,9 @@ const resolvers = {
           filter(pathSatisfies(startsWith(path(['type'], args) + '/'), ['mimeType'])),
         ),
         when(
-          () => 
-            pathSatisfies(notNil, ['limit'], args),
-          take(path(['limit'], args)),
+          () => pathSatisfies(notNil, ['limit'], args), 
+          // @ts-ignore
+          take(path(['limit'], args)), 
         ),
         when(
           () => 
@@ -153,14 +153,16 @@ const resolvers = {
   },
 
   YoutubePlaylist: {
+    /** @type {(ref: {id: string}) => Promise<string>} */
     __resolveReference: async ref => 
       ytpl(ref.id),
 
-    items: parent => 
-      pipe(
-        path(['items']),
-        map(getYoutubeItem),
-      )(parent)
+    /** @type {(parent: object) => [*]} */
+    // @ts-ignore
+    items: pipe(
+      path(['items']),
+      map(getYoutubeItem),
+    )
   },
 }
 

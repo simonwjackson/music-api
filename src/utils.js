@@ -12,7 +12,7 @@ import {
   map,
   prop,
   tap,
-  when 
+  when
 } from 'ramda'
 
 
@@ -64,7 +64,17 @@ export const whenFound = when(complement(isNil))
 export const mapFrom = flip(map)
 
 
-export const allFail = conditionals => obj => !allPass(conditionals)(obj)
+/**
+ * @param  predicates 
+ * @param  obj 
+ * @return a booleand
+ *
+ * @typedef { import("ramda/tools").Pred } Pred
+ */ 
+export const allFail = curry(
+  /** @type {(predicates: Pred[], obj: object) => boolean} */
+  (predicates, obj) => !allPass(predicates)(obj)
+)
 
 
 export const isFalsy = anyPass([
