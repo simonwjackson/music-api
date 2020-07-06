@@ -11,8 +11,8 @@ services:
     ports:
       - 30000:30000
     environment:
-      - HTTP_USER=$HTTP_USER
-      - HTTP_PASS=$HTTP_PASS
+      - JWT_DOMAIN=$JWT_DOMAIN
+      - JWT_AUDIENCE=$JWT_AUDIENCE
       - PORT=$PORT
     entrypoint: "npm"
 

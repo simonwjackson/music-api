@@ -1,16 +1,17 @@
 /* eslint-disable fp/no-unused-expression */
 import { path } from 'ramda'
-import { notEmpty } from 'utils'
 
 import { createApp } from './graphql'
 
 const port = path(['env', 'PORT'], process) || 4000
-const USER = path(['env', 'HTTP_USER'], process)
-const PASS = path(['env', 'HTTP_PASS'], process)
+const audience = path(['env', 'JWT_AUDIENCE'], process)
+const domain = path(['env', 'JWT_DOMAIN'], process)
 
-const users = notEmpty(USER) || notEmpty(PASS) ? { [USER]: PASS } : {}
 
-createApp({ port, users })
+createApp({
+  express: { port },
+  jwt: { audience, domain }
+})
   .listen({ port }, () =>
     console.log('🚀 Server ready')
   )

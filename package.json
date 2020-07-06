@@ -1,6 +1,6 @@
 {
   "name": "musicati",
-  "version": "20.7.0",
+  "version": "20.7.1",
   "description": "",
   "main": "index.js",
   "dependencies": {
@@ -14,9 +14,15 @@
     "bottleneck": "^2.19.5",
     "express": "^4.17.1",
     "express-basic-auth": "^1.2.0",
+    "express-jwt": "^6.0.0",
+    "express-jwt-authz": "^2.4.0",
     "google": "^2.1.0",
     "google-it": "^1.5.0",
     "graphql-iso-date": "^3.6.1",
+    "graphql-middleware": "^4.0.2",
+    "graphql-shield": "^7.3.2",
+    "jsonwebtoken": "^8.5.1",
+    "jwks-rsa": "^1.8.1",
     "keyv": "^4.0.1",
     "musicbrainz-api": "^0.5.2",
     "node-persist": "^3.0.5",

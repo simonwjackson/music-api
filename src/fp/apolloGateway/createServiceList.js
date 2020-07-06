@@ -6,11 +6,20 @@ import {
   always,
   curry,
   map,
+  mergeLeft,
   pipe,
   toPairs,
 } from 'ramda'
 
 const _createService = (app, port, [name, settings]) => pipe(
+  // TODO: Refactor into HOC 
+  mergeLeft({
+    context: ({ req }) => {
+      const user = req.headers.user ? JSON.parse(req.headers.user) : null
+
+      return { user }
+    }
+  }),
   createServer,
   applyMiddleware({
     app,
