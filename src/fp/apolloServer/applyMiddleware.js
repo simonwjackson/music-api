@@ -10,7 +10,7 @@ import {
 } from 'ramda'
 
 
-const _applyMiddleware = (federatedOptions, server) => pipe(
+const applyMiddleware = (federatedOptions, server) => pipe(
   server => bind(server.applyMiddleware, server),
   compose(
     tap,
@@ -18,4 +18,4 @@ const _applyMiddleware = (federatedOptions, server) => pipe(
   )
 )(server) 
 
-export default curry(_applyMiddleware)
+export default curry(applyMiddleware)

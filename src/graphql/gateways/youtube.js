@@ -1,5 +1,6 @@
 import { buildFederatedSchema } from '@apollo/federation'
 import { gql } from 'apollo-server'
+import permissions from 'graphql/permissions'
 import storage from 'node-persist' 
 import {
   andThen,
@@ -112,15 +113,14 @@ const typeDefs = gql`
 
 const resolvers = {
   Query: {
-    youtubePlaylist: (parent, args) => 
-      pipe(
-        when(
-          notStartsWith('https://'),
-          id => 
-            concat('https://www.youtube.com/playlist?list=', id)
-        ),
-        ytpl
-      )(args.id)
+    youtubePlaylist: (parent, args, ctx) => pipe(
+      when(
+        notStartsWith('https://'),
+        id => 
+          concat('https://www.youtube.com/playlist?list=', id)
+      ),
+      ytpl
+    )(args.id)
   },
 
   YoutubeItem: {
@@ -166,4 +166,7 @@ const resolvers = {
   },
 }
 
-export default { schema: buildFederatedSchema({ typeDefs, resolvers }) }
+export default { 
+  permissions,
+  schema: buildFederatedSchema({ typeDefs, resolvers }) 
+}

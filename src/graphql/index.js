@@ -1,6 +1,8 @@
 /* eslint-disable fp/no-unused-expression */ 
+import { RemoteGraphQLDataSource } from '@apollo/gateway'
+import { AuthenticationError } from 'apollo-server'
 import express from 'express'
-import basicAuth from 'express-basic-auth'
+import expressJwt from 'express-jwt'
 import {
   createGateway,
   createServiceList
@@ -9,40 +11,91 @@ import {
   applyMiddleware,
   createServer,
 } from 'fp/apolloServer'
+import jwksRsa from 'jwks-rsa'
 import { curry } from 'ramda'
 import { notEmpty } from 'utils'
 
 import * as gateways from './gateways' 
 
+
 /**
- * @typedef {Object} Options - creates a new type named 'SpecialType'
- * @property {string} port - a string property of SpecialType
- * @property {number} [users] - a number property of SpecialType
- *
- * @param {Options} options - a number property of SpecialType
+ * @typedef {Object} JwtOptions creates a new type named 'SpecialType'
+ * @property {string} domain JWT domain
+ * @property {string} audience Audience / Client ID
+ */
+
+/**
+ * @typedef {Object} ExpressOptions creates a new type named 'SpecialType'
+ * @property {string} port a string property of SpecialType
+ */
+
+/** @typedef {Object} AppOptions creates a new type named 'SpecialType'
+ * @property {ExpressOptions} express Auth0 client ID
+ * @property {JwtOptions} [jwt] Auth0 client ID
+ */
+
+/** @param {AppOptions} options - a number property of SpecialType
  */
 export const createApp = curry(
-  /** @type {(options: Options) => express} */ 
-  ({ port, users }) => {
+  /** @type {(options: AppOptions) => express} */ 
+  options => {
     const app = express() 
     // @ts-ignore
-    const gateway = createGateway({ serviceList: createServiceList(app, port, gateways) })
-
-    const server = createServer({ 
-      cors: {
-        origin: '*',
-        credentials: false,
-      }, 
-      gateway,
-      subscriptions: false,
+    const gateway = createGateway({ 
+      buildService({ url }) {
+        return new RemoteGraphQLDataSource({
+          url,
+          willSendRequest({ request, context }) {
+            request.http.headers.set(
+              'user',
+              context.user ? JSON.stringify(context.user) : null
+            )
+          }
+        })
+      },
+      serviceList: createServiceList(app, options.express.port, gateways) 
     })
 
-    if (notEmpty(users)) 
-      app.use(basicAuth({
-        // @ts-ignore
-        users,
-        challenge: true,
-      }))
+    const server = createServer({ 
+      cors: { origin: '*' }, 
+      gateway,
+      subscriptions: false,
+      context: ({ req }) => {
+        const user = req.user || null
+
+        return { user }
+      }
+    })
+
+
+    if (notEmpty(options.jwt)){
+      app.use(
+        expressJwt({
+          secret: jwksRsa.expressJwtSecret({
+            cache: true,
+            rateLimit: true,
+            jwksRequestsPerMinute: 5,
+            jwksUri: `https://${options.jwt.domain}/.well-known/jwks.json`
+          }),
+          aud: options.jwt.audience,
+          issuer: `https://${options.jwt.domain}/`,
+          algorithms: ['RS256']
+        })
+      )
+
+
+      app.use((err, req, res, next) => {
+        if (err.name === 'UnauthorizedError') 
+          res.json(new AuthenticationError('You must be logged in to do this'))
+      })
+    }
+
+    // if (notEmpty(users))
+    //   app.use(basicAuth({
+    //     // @ts-ignore
+    //     users,
+    //     challenge: true,
+    //   }))
 
     applyMiddleware({
       app,
